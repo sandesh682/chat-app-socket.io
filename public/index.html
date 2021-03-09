@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head> 
+    <title>Socket.IO chat</title>
+  </head>
+
+  <body>
+    <form>
+        <input type="text" id="inputMessage">
+        <button id="send">Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+       
+        document.querySelector('#send').addEventListener('click',(event)=>{
+           
+            event.preventDefault()
+            let message = document.querySelector('#inputMessage').value
+            
+            if(message.length != 0){
+                 socket.emit('sendMessage',message)
+            }
+            else{
+                alert('Enter message')
+            }
+        })
+
+        socket.on('sendMessage',(message)=>{
+            console.log('Message is:'+message)
+        })
+
+      </script>
+  </body>
+</html>
