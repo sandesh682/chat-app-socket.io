@@ -17,13 +17,19 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('sendMessage','A new user has joined..!')
   
     // To send message to all users...!
-    socket.on('sendMessage',(message)=>{        
+    socket.on('sendMessage',(message,callback)=>{        
         io.emit('sendMessage',message)
+        callback('Devivered!')
+    })
+
+    socket.on('sendLocation',(coords,callback)=>{
+      io.emit('locationMessage',`https://www.google.com/maps?q=${coords.latitude},${coords.longitude}`)
+      callback('Location Shared')
     })
 
     //To send message to all users except who left...!, Disconnect event will get called automatically when browser window closes
     socket.on('disconnect', () => {
-        io.emit('sendMessage','a use has left!')
+        io.emit('sendMessage','a user has left!')
     });
 
 });
