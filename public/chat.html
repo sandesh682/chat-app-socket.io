@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat App</title>
+    <link rel="icon" href="img/favicon.png">
+    <link rel="stylesheet" href="css/styles.css">
+  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+  </head>
+
+  <body>
+    <div class="chat">
+
+      <div class="chat__sidebar">
+
+      </div>
+
+      <div class="chat__main">
+        <div id="messages" class="chat__messages">
+
+        </div>
+        <div class="compose">
+          <form>
+            <input type="text" id="inputMessage" />
+            <button id="send">Send</button>
+          </form>
+          <button id="location">Send location</button>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous"></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+
+      document.querySelector("#send").addEventListener("click", (event) => {
+        event.preventDefault();
+
+        let message = document.querySelector("#inputMessage").value;
+
+        if (message.length != 0) {
+          document.querySelector("#send").setAttribute("disabled", "disabled");
+
+          socket.emit("sendMessage", message, (message) => {
+            console.log(message);
+          });
+
+          document.querySelector("#send").removeAttribute("disabled");
+
+          document.querySelector("#inputMessage").value = "";
+          document.querySelector("#inputMessage").focus();
+        } else {
+          alert("Enter message");
+        }
+      });
+
+      socket.on("sendMessage", (message) => {
+        
+          var div = document.createElement("div");
+          div.classList.add('message')
+
+          var p = document.createElement("p");
+          var span1 = document.createElement("span");
+          span1.innerText = 'Some User Name'
+          span1.classList.add("message__name")
+
+          var span2 = document.createElement("span");
+          span2.innerText = moment().format("h:mm a")
+          span2.classList.add("message__meta")
+
+          p.append(span1)
+          p.append(span2)
+           
+          div.append(p)
+          div.innerHTML = div.innerHTML + "<p style='margin-top:-15px'>"+message+"</p>"
+
+          document.querySelector('#messages').append(div)
+
+      });
+
+      socket.on("locationMessage", (url) => {
+        
+        var div = document.createElement("div");
+        div.classList.add('message')
+
+        var p = document.createElement("p");
+        var span1 = document.createElement("span");
+        span1.innerText = 'Some User Name'
+        span1.classList.add("message__name")
+
+        var span2 = document.createElement("span");
+        span2.innerText = moment().format("h:mm a")
+        span2.classList.add("message__meta")
+
+        p.append(span1)
+        p.append(span2)
+
+        var a = document.createElement("a"); 
+        a.innerText = 'My Current location!'
+        a.href = url
+        a.target = "_blank"
+        a.classList.add('adjust-location')
+
+        div.append(p)
+        div.append(a) 
+
+        document.querySelector('#messages').append(div)
+      });
+
+      document.querySelector("#location").addEventListener("click", (event) => {
+        if (!navigator.geolocation) {
+          return alert("Geolocation is not supported by your browser.");
+        }
+        document
+          .querySelector("#location")
+          .setAttribute("disabled", "disabled");
+        navigator.geolocation.getCurrentPosition((position) => {
+          socket.emit(
+            "sendLocation",
+            {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            },
+            (message) => {
+              console.log(message);
+            }
+          );
+
+          document.querySelector("#location").removeAttribute("disabled");
+        });
+      });
+    </script>
+  </body>
+</html>
