@@ -4,7 +4,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const path = require('path')
 const { getUser,getUsersFromRoom,removeUser,addUser } = require('./public/users')
-const port = Process.env.PORT || 3000 ;
+const port = process.env.PORT || 3000 ;
 
 app.use(express.static(path.join(__dirname, "public")))
 
