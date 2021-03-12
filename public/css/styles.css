@@ -134,11 +134,20 @@ button:disabled {
     font-size: 14px;
 }
 
+.adjust-location {
+    margin-top: -15px;
+}
+
 .message a {
     color: #0070CC;
 }
 
 /* Message Composition Styles */
+
+li {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
 
 .compose {
     display: flex;

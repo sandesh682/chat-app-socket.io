@@ -9,7 +9,7 @@ document.querySelector("#send").addEventListener("click", (event) => {
     document.querySelector("#send").setAttribute("disabled", "disabled");
 
     socket.emit("sendMessage", message, (message) => {
-      console.log(message);
+      
     });
 
     document.querySelector("#send").removeAttribute("disabled");
@@ -20,6 +20,49 @@ document.querySelector("#send").addEventListener("click", (event) => {
     alert("Enter message");
   }
 });
+
+socket.on('liveUsers',(roomData)=>{
+
+    document.querySelector('.chat__sidebar').innerHTML = ""
+
+    document.querySelector('.chat__sidebar').innerHTML = document.querySelector('.chat__sidebar').innerHTML + "<h2 class='room-title'>"+roomData['room']+"</h2>"
+    
+    document.querySelector('.chat__sidebar').innerHTML = document.querySelector('.chat__sidebar').innerHTML + "<h3 class='list-title'>Active Users</h3>"
+
+    let ul = document.createElement('ul')
+    ul.classList.add('users')
+
+    roomData['activeUsers'].forEach(user => {
+        let li = document.createElement('li')
+        li.innerHTML = "<i class='fas fa-circle'></i> " + user['username']
+
+        ul.append(li)
+    })
+
+    document.querySelector('.chat__sidebar').append(ul)
+})
+
+let autoscroll = ()=> {
+   
+    const newMessage = document.querySelector('#messages').lastElementChild
+    const newMessageStyles = getComputedStyle(newMessage)
+    const newMessageMargin = parseInt(newMessageStyles.marginBottom)
+
+    const newMessageHeight = newMessage.offsetHeight + newMessageMargin
+
+    //visible height from top till send butoon
+    const visibleHeight = document.querySelector('#messages').offsetHeight
+
+    //Height of message container
+    const containerHeight = document.querySelector('#messages').scrollHeight
+
+    // How far have i scrolled?
+    const scrollOffset = document.querySelector('#messages').scrollTop + visibleHeight
+
+    if(containerHeight - newMessageHeight <= scrollOffset){
+        document.querySelector('#messages').scrollTop = document.querySelector('#messages').scrollHeight
+    }
+}
 
 socket.on("sendMessage", (message,username) => {
   
@@ -42,6 +85,7 @@ socket.on("sendMessage", (message,username) => {
     div.innerHTML = div.innerHTML + "<p style='margin-top:-15px'>"+message+"</p>"
 
     document.querySelector('#messages').append(div)
+    autoscroll()
 
 });
 
@@ -72,6 +116,7 @@ socket.on("locationMessage", (url,username) => {
   div.append(a) 
 
   document.querySelector('#messages').append(div)
+  autoscroll()
 });
 
 document.querySelector("#location").addEventListener("click", (event) => {
@@ -89,7 +134,7 @@ document.querySelector("#location").addEventListener("click", (event) => {
         longitude: position.coords.longitude,
       },
       (message) => {
-        console.log(message);
+        
       }
     );
 

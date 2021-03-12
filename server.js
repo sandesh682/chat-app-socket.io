@@ -49,6 +49,11 @@ io.on('connection', (socket) => {
           socket.emit('sendMessage',`Welcome,${username}`)
           // To send message to all users except , new joiner
           socket.broadcast.to(room).emit('sendMessage',`${username} has joined.`)
+
+          io.to(room).emit('liveUsers',{
+             room : room,
+             activeUsers : getUsersFromRoom(room)['data']
+          })
       }
       else{
         callback(response['message'])
@@ -64,6 +69,10 @@ io.on('connection', (socket) => {
         
         if(user){
           io.to(user['room']).emit('sendMessage',`${user['username']} has left!`)
+          io.to(user['room']).emit('liveUsers',{
+            room : user['room'],
+            activeUsers : getUsersFromRoom(user['room'])['data']
+         })
         }
     });
 
